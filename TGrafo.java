@@ -80,50 +80,48 @@ public class TGrafo {
 
 
 	public int[] Prim(int origem) {
-        Set<Integer> Nconect = new TreeSet<Integer>(); // vértices não conectados
-		Set<Integer> conect = new TreeSet<Integer>(); // vértices conectados
-		Set<Integer> vizinhos; // vértices não conectados vizinhos de Nconect
+        Set<Integer> conect = new TreeSet<Integer>();
 
         int[] ant = new int[n];
 		Arrays.fill(ant, -1);
 
         // INICIALIZAÇÃO
 		conect.add(origem);
-        for (int i = 0; i < n; i++) {
-            if (i == origem) continue;
-            Nconect.add(i);
-        }
 
-        // enquanto (Nconect não estiver vazia) faça
-		while (!Nconect.isEmpty()) {
-            
-            vizinhos = new TreeSet<Integer>();
-            for (int V : conect) {
-                for (int i = 0; i < n; i++) {
-                    if (adj[V][i] != INF && Nconect.contains(i)) vizinhos.add(i);
+        PrimRecursivo(conect, ant);
+
+        return ant;
+	}
+
+
+    private void PrimRecursivo(Set<Integer> conect, int[] ant) {
+
+        if (conect.size() == n) return;
+
+        int r = -1;
+        int origemR = -1;
+        int p = INF;
+
+        for (int i : conect) {
+
+            for (int j = 0; j < n; j++) {
+
+                if (conect.contains(j)) continue;
+
+                if (adj[i][j] != INF && adj[i][j] < p) {
+                    r = j;
+                    origemR = i;
+                    p = adj[i][j];
                 }
             }
+        }
 
-            // sem vizinhos = grafo desconexo;
-            if (vizinhos.isEmpty()) break;
+        // sem aresta válida = grafo desconexo
+        if (r == -1) return;
 
-			int r = -1;
-            int origemR = -1;
-            int p = INF;
-			for (int i : conect) {
-				for (int j : vizinhos) {
-                    if (adj[i][j] != INF && (r == -1 || adj[i][j] < p)) {
-                        r = j;
-                        origemR = i;
-                        p = adj[i][j];
-                    }
-                }
-			}
+        ant[r] = origemR;
+        conect.add(r);
 
-            ant[r] = origemR;
-			conect.add(r);
-			Nconect.remove(r);
-		}
-        return ant;
+        PrimRecursivo(conect, ant);
 	}
 }
